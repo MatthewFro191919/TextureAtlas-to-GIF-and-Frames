@@ -4,7 +4,6 @@ import tkinter as tk
 # Import our own modules
 from utils.utilities import Utilities
 
-
 class TxtParser:
     """
     A class to parse TXT files and extract sprite data.
@@ -33,9 +32,9 @@ class TxtParser:
 
     def extract_names(self):
         names = set()
-        with open(os.path.join(self.directory, self.txt_filename), "r") as file:
+        with open(os.path.join(self.directory, self.txt_filename), 'r') as file:
             for line in file:
-                parts = line.split(" = ")[0]
+                parts = line.split(' = ')[0]
                 name = Utilities.strip_trailing_digits(parts)
                 names.add(name)
         return names
@@ -47,10 +46,10 @@ class TxtParser:
     @staticmethod
     def parse_txt_packer(file_path):
         sprites = []
-        with open(file_path, "r") as file:
+        with open(file_path, 'r') as file:
             for line in file:
-                parts = line.split(" = ")
+                parts = line.split(' = ')
                 name = parts[0].strip()
                 x, y, width, height = map(int, parts[1].split())
-                sprites.append({"name": name, "x": x, "y": y, "width": width, "height": height})
+                sprites.append({'name': name, 'x': x, 'y': y, 'width': width, 'height': height})
         return sprites

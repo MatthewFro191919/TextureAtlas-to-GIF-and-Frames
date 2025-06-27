@@ -9,7 +9,7 @@ from tkinter import messagebox
 from PIL import Image
 import tempfile
 
-# Import our own modules
+## Import our own modules
 from core.atlas_processor import AtlasProcessor
 from core.sprite_processor import SpriteProcessor
 from core.frame_selector import FrameSelector
@@ -17,7 +17,6 @@ from core.animation_processor import AnimationProcessor
 from core.animation_exporter import AnimationExporter
 from core.exception_handler import ExceptionHandler
 from utils.utilities import Utilities
-
 
 class Extractor:
     """
@@ -59,20 +58,12 @@ class Extractor:
 
         cpu_threads = os.cpu_count() // 4
         if self.app_config:
-            resource_limits = self.app_config.get("resource_limits", {})
-            cpu_cores_val = resource_limits.get("cpu_cores", "auto")
-            print(f"[Extractor] CPU cores setting from config: {cpu_cores_val}")
+            cpu_cores_val = self.app_config.get("cpu_cores", "auto")
             try:
                 if cpu_cores_val != "auto":
                     cpu_threads = max(1, min(int(cpu_cores_val), os.cpu_count()))
-                    print(f"[Extractor] Using {cpu_threads} CPU threads (from config)")
-                else:
-                    print(f"[Extractor] Using {cpu_threads} CPU threads (auto: {os.cpu_count()}//4)")
             except Exception:
                 cpu_threads = os.cpu_count() // 4
-                print(f"[Extractor] Error reading CPU config, defaulting to {cpu_threads} threads")
-        else:
-            print(f"[Extractor] No app config found, using default {cpu_threads} CPU threads")
 
         start_time = time.time()
 
@@ -81,9 +72,9 @@ class Extractor:
 
             filenames = spritesheet_list
             for filename in filenames:
-                base_filename = filename.rsplit(".", 1)[0]
-                xml_path = os.path.join(input_dir, base_filename + ".xml")
-                txt_path = os.path.join(input_dir, base_filename + ".txt")
+                base_filename = filename.rsplit('.', 1)[0]
+                xml_path = os.path.join(input_dir, base_filename + '.xml')
+                txt_path = os.path.join(input_dir, base_filename + '.txt')
 
                 if os.path.isfile(xml_path) or os.path.isfile(txt_path):
                     sprite_output_dir = os.path.join(output_dir, base_filename)
@@ -103,16 +94,16 @@ class Extractor:
             for future in concurrent.futures.as_completed(futures):
                 try:
                     result = future.result()
-                    total_frames_generated += result["frames_generated"]
-                    total_anims_generated += result["anims_generated"]
-                    total_sprites_failed += result["sprites_failed"]
+                    total_frames_generated += result['frames_generated']
+                    total_anims_generated += result['anims_generated']
+                    total_sprites_failed += result['sprites_failed']
 
                 except Exception as e:
                     total_sprites_failed += 1
                     messagebox.showerror("Error", f"Something went wrong!!\n{str(e)}")
                     if not messagebox.askyesno("Continue?", "Do you want to try continue processing?"):
                         sys.exit()
-
+                        
                 tk_root.after(0, progress_var.set, progress_var.get() + 1)
                 tk_root.after(0, tk_root.update_idletasks)
                 gc.collect()
@@ -121,9 +112,7 @@ class Extractor:
         duration = end_time - start_time
         minutes, seconds = divmod(duration, 60)
 
-        tk_root.after(
-            0,
-            messagebox.showinfo,
+        tk_root.after(0, messagebox.showinfo,
             "Information",
             f"Finished processing all files.\n\n"
             f"Frames Generated: {total_frames_generated}\n"
@@ -141,15 +130,13 @@ class Extractor:
             atlas_processor = AtlasProcessor(atlas_path, metadata_path)
             sprite_processor = SpriteProcessor(atlas_processor.atlas, atlas_processor.sprites)
             animations = sprite_processor.process_sprites()
-            animation_processor = AnimationProcessor(
-                animations, atlas_path, output_dir, self.settings_manager, self.current_version
-            )
+            animation_processor = AnimationProcessor(animations, atlas_path, output_dir, self.settings_manager, self.current_version)
 
             frames_generated, anims_generated = animation_processor.process_animations()
             return {
-                "frames_generated": frames_generated,
-                "anims_generated": anims_generated,
-                "sprites_failed": sprites_failed,
+                'frames_generated': frames_generated,
+                'anims_generated': anims_generated,
+                'sprites_failed': sprites_failed
             }
 
         except ET.ParseError:
@@ -181,41 +168,35 @@ class Extractor:
             animation_exporter = AnimationExporter(
                 temp_dir,
                 self.current_version,
-                lambda img, size: img.resize(
-                    (round(img.width * abs(size)), round(img.height * abs(size))), Image.NEAREST
-                ),
-                quant_frames,
+                lambda img, size: img.resize((round(img.width * abs(size)), round(img.height * abs(size))), Image.NEAREST),
+                quant_frames
             )
 
             for anim_name, image_tuples in animations.items():
                 spritesheet_name = os.path.basename(atlas_path)
-                preview_settings = self.settings_manager.get_settings(
-                    spritesheet_name, f"{spritesheet_name}/{anim_name}"
-                )
+                preview_settings = self.settings_manager.get_settings(spritesheet_name, f"{spritesheet_name}/{anim_name}")
                 merged_settings = {**preview_settings, **settings}
-                merged_settings["animation_format"] = "GIF"
+                merged_settings['animation_format'] = 'GIF'
 
-                indices = merged_settings.get("indices")
+                indices = merged_settings.get('indices')
                 if indices:
                     indices = list(filter(lambda i: ((i < len(image_tuples)) & (i >= 0)), indices))
                     image_tuples = [image_tuples[i] for i in indices]
 
                 single_frame = FrameSelector.is_single_frame(image_tuples)
-                kept_frames = FrameSelector.get_kept_frames(
-                    merged_settings, single_frame, image_tuples
-                )
-
+                kept_frames = FrameSelector.get_kept_frames(merged_settings, single_frame, image_tuples)
                 kept_frame_indices = FrameSelector.get_kept_frame_indices(kept_frames, image_tuples)
-                image_tuples = [
-                    img for idx, img in enumerate(image_tuples) if idx in kept_frame_indices
-                ]
+                image_tuples = [img for idx, img in enumerate(image_tuples) if idx in kept_frame_indices]
 
                 animation_exporter.save_animations(
-                    image_tuples, spritesheet_name, anim_name, merged_settings
+                    image_tuples,
+                    spritesheet_name,
+                    anim_name,
+                    merged_settings
                 )
 
                 for file in os.listdir(temp_dir):
-                    if file.endswith(".gif"):
+                    if file.endswith('.gif'):
                         return os.path.join(temp_dir, file)
             return None
 

@@ -1,8 +1,6 @@
 import re
 import os
-import sys
 from string import Template
-
 
 class Utilities:
     """
@@ -12,8 +10,6 @@ class Utilities:
         find_root(target_name):
             Walks up the directory tree from the current file location until it finds a directory containing the target_name (file or folder).
             Returns the path to the directory containing the target_name, or None if not found.
-        is_compiled():
-            Determine if the application is running as a Nuitka-compiled executable.
         count_spritesheets(spritesheet_list):
             Count the number of spritesheet data files in a list.
         replace_invalid_chars(name):
@@ -23,19 +19,10 @@ class Utilities:
         format_filename(prefix, sprite_name, animation_name, filename_format, replace_rules):
             Formats the filename based on the given parameters and applies find/replace rules.
     """
-
+    
     @staticmethod
     def find_root(target_name):
-        if Utilities.is_compiled():
-            root_path = os.path.dirname(sys.executable)
-        else:
-            root_path = os.path.abspath(os.path.dirname(__file__))
-
-        target_path = os.path.join(root_path, target_name)
-        if os.path.exists(target_path):
-            print(f"[find_root] Found '{target_name}' at: {target_path}")
-            return root_path
-
+        root_path = os.path.abspath(os.path.dirname(__file__))
         while True:
             target_path = os.path.join(root_path, target_name)
             if os.path.exists(target_path):
@@ -45,16 +32,7 @@ class Utilities:
             if new_root == root_path:
                 break
             root_path = new_root
-
-        print(f"[find_root] Could not find '{target_name}' in directory tree")
         return None
-
-    @staticmethod
-    def is_compiled():
-        if "__compiled__" in globals():
-            return True
-        else:
-            return False
 
     @staticmethod
     def count_spritesheets(spritesheet_list):
@@ -62,12 +40,12 @@ class Utilities:
 
     @staticmethod
     def replace_invalid_chars(name):
-        return re.sub(r'[\\/:*?"<>|]', "_", name).rstrip()
-
+        return re.sub(r'[\\/:*?"<>|]', '_', name).rstrip()
+    
     @staticmethod
     def strip_trailing_digits(name):
-        return re.sub(r"\d{1,4}(?:\.png)?$", "", name).rstrip()
-
+        return re.sub(r'\d{1,4}(?:\.png)?$', '', name).rstrip()
+    
     @staticmethod
     def format_filename(prefix, sprite_name, animation_name, filename_format, replace_rules):
         # Provide safe defaults for preview function or missing values
@@ -85,7 +63,7 @@ class Utilities:
                 base_name = base_name.replace(" ", "").replace("-", "").replace("_", "")
         else:
             base_name = Template(filename_format).safe_substitute(sprite=sprite_name, anim=animation_name)
-
+            
         for rule in replace_rules:
             if rule["regex"]:
                 base_name = re.sub(rule["find"], rule["replace"], base_name)

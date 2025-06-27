@@ -30,6 +30,7 @@ if not defined PY_VER (
     )
 )
 
+
 for /f "tokens=1,2 delims=." %%A in ("!PY_VER!") do (
     set MAJOR=%%A
     set MINOR=%%B
@@ -61,22 +62,10 @@ if !VER_OK! NEQ 1 (
 
 echo Python !PY_VER! found.
 
-REM Upgrade pip to the latest version
-!PY_CMD! -m pip install --upgrade pip
-
 :INSTALL_REQUIREMENTS
 set /p INSTALL_REQ="Do you want to install the required libraries for TextureAtlas to GIF and Frames? (Y/N): "
 if /I "%INSTALL_REQ%"=="Y" (
-    echo Which requirements file do you want to install?
-    echo   1. requirements.txt
-    echo   2. requirements-fallback.txt
-    set /p REQ_CHOICE="Enter 1 or 2: "
-    if "%REQ_CHOICE%"=="2" (
-        set REQ_FILE=requirements-fallback.txt
-    ) else (
-        set REQ_FILE=requirements.txt
-    )
-    !PY_CMD! -m pip install --upgrade -r "%~dp0!REQ_FILE!"
+    !PY_CMD! -m pip install -r "%~dp0requirements.txt"
     pause
 ) else (
     echo Skipping requirements installation.

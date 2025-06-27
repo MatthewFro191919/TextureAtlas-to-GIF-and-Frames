@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
 
-
 class FindReplaceWindow:
     """
     A window for managing find-and-replace rules for filenames.
@@ -21,7 +20,6 @@ class FindReplaceWindow:
         store_replace_rules():
             Collects all rule entries and calls the callback with the updated rules.
     """
-
     def __init__(self, parent, replace_rules, on_store_callback):
         self.replace_window = tk.Toplevel(parent)
         self.replace_window.geometry("400x300")
@@ -31,19 +29,15 @@ class FindReplaceWindow:
         self.replace_rules = replace_rules
         self.on_store_callback = on_store_callback
 
-        add_button = tk.Button(
-            self.replace_window,
-            text="Add rule",
-            command=lambda: self.add_replace_rule({"find": "", "replace": "", "regex": False}),
-        )
+        add_button = tk.Button(self.replace_window, text='Add rule', command=lambda: self.add_replace_rule({"find":"","replace":"","regex":False}))
         add_button.pack()
         for rule in self.replace_rules:
             self.add_replace_rule(rule)
-        ok_button = tk.Button(self.replace_window, text="OK", command=self.store_replace_rules)
+        ok_button = tk.Button(self.replace_window, text='OK', command=self.store_replace_rules)
         ok_button.pack()
 
     def add_replace_rule(self, rule):
-        frame = tk.Frame(self.rules_frame, borderwidth=2, relief="sunken")
+        frame = tk.Frame(self.rules_frame, borderwidth=2, relief='sunken')
         find_entry = tk.Entry(frame, width=40)
         find_entry.insert(0, rule["find"])
         find_entry.pack()
@@ -65,12 +59,10 @@ class FindReplaceWindow:
         rules = []
         for rule in self.rules_frame.winfo_children():
             rule_settings = rule.winfo_children()
-            rules.append(
-                {
-                    "find": rule_settings[0].get(),
-                    "replace": rule_settings[1].get(),
-                    "regex": "selected" in rule_settings[2].state(),
-                }
-            )
+            rules.append({
+                "find": rule_settings[0].get(),
+                "replace": rule_settings[1].get(),
+                "regex": "selected" in rule_settings[2].state()
+            })
         self.on_store_callback(rules)
         self.replace_window.destroy()
