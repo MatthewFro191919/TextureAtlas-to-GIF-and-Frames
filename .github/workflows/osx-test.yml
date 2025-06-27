@@ -9,10 +9,10 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@main
 
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@main
       with:
         python-version: 3.12
 
@@ -37,7 +37,7 @@ jobs:
         "TextureAtlas to GIF and Frames.py"
 
     - name: Archive build output
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@main
       with:
         name: macos-build
         path: ./TextureAtlas\ to\ GIF\ and\ Frames.dist/
