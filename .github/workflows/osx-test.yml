@@ -34,7 +34,7 @@ jobs:
         --product-version=1.8.1 \
         --copyright="Copyright © 2024 AutisticLulu. Licensed under the GNU Affero General Public License (AGPL)" \
         --file-description="TextureAtlas to GIF and Frames" \
-        "TextureAtlas to GIF and Frames.py"
+        "TheThing.py"
 
     - name: Archive build output
       uses: actions/upload-artifact@main
